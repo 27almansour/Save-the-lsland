@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -163,7 +163,7 @@
     farm: { icon:"🌾", name:"مزرعة", cost:15, terrain:["grass"], workerCap:2, foodPerWorker:3, minStage:1, desc:"تنتج الطعام حسب عدد العمال فيها" },
     woodcutter: { icon:"🪓", name:"كوخ حطّاب", cost:10, terrain:["forest"], workerCap:2, woodPerWorker:2, pollutionPerWorker:1.5, minStage:1, desc:"ينتج خشبًا، لكنه يلوّث الهواء ويستنزف الغابة تدريجيًا" },
     park: { icon:"🌳", name:"حديقة", cost:8, terrain:["grass"], pollutionReduce:4, minStage:1, desc:"تنقّي الهواء وتساعد الأشجار المجاورة على التجدد" },
-    road: { icon:"🛤", name:"طريق", cost:5, terrain:["grass"], minStage:1, desc:"يقرّب حضارتك من اكتشاف العربات والخيول" },
+    road: { icon:"🛤️", name:"طريق", cost:5, terrain:["grass"], minStage:1, desc:"يقرّب حضارتك من اكتشاف العربات والخيول" },
     port: { icon:"⚓", name:"ميناء", cost:40, terrain:["grass"], needsWater:true, minStage:2, desc:"يفتح الطريق أمام بناء السفن والتجارة البحرية" }
   };
 
@@ -339,7 +339,7 @@
     }
     if (island.pollution >= CONFIG.pollutionCrisisThreshold && island.pop > 0 && Math.random() < 0.3){
       island.pop = Math.max(0, island.pop - 1);
-      addLog("☠ تلوث الهواء الخطير في " + island.name + " يضرّ بصحة السكان!");
+      addLog("☠️ تلوث الهواء الخطير في " + island.name + " يضرّ بصحة السكان!");
     }
 
     for (var i = 0; i < island.tiles.length; i++){
@@ -442,7 +442,7 @@
       islands:[island1, island2],
       selectedIslandId:"island1", selectedTool:null,
       pendingShipments:[],
-      log:["🏝 رست سفينتك على شاطئ جزيرة مجهولة... حان وقت بناء حضارتك!"],
+      log:["🏝️ رست سفينتك على شاطئ جزيرة مجهولة... حان وقت بناء حضارتك!"],
       resetArmed:false, showHelp:true
     };
     state = s;
@@ -471,7 +471,7 @@
   }
 
   function stageInfo(){
-    if (state.stage === 1) return { name:"🚶 عصر المشي", progress:"🛤 طرق: " + state.totalRoads + "/" + CONFIG.stage2.roads + " · 👥 سكان الحضارة: " + state.totalPop + "/" + CONFIG.stage2.pop };
+    if (state.stage === 1) return { name:"🚶 عصر المشي", progress:"🛤️ طرق: " + state.totalRoads + "/" + CONFIG.stage2.roads + " · 👥 سكان الحضارة: " + state.totalPop + "/" + CONFIG.stage2.pop };
     if (state.stage === 2) return { name:"🐎 عصر العربات والخيول", progress: state.portBuilt ? ("👥 سكان الحضارة: " + state.totalPop + "/" + CONFIG.stage3.pop + " (الميناء جاهز ⚓)") : ("⚓ ابنِ ميناءً وزد السكان إلى " + CONFIG.stage3.pop + " للانتقال لعصر السفن") };
     return { name:"🚢 عصر السفن والتجارة البحرية", progress:"🌊 حضارتك تُبحر بين الجزر بحرية!" };
   }
@@ -486,11 +486,11 @@
     var isl1 = state.islands[0], isl2 = state.islands[1];
     var tab2 = "";
     if (isl2.founded){
-      tab2 = '<button type="button" class="tab ' + (state.selectedIslandId==="island2"?"tab--active":"") + '" data-action="select-island" data-island="island2">🏝 ' + isl2.name + '</button>';
+      tab2 = '<button type="button" class="tab ' + (state.selectedIslandId==="island2"?"tab--active":"") + '" data-action="select-island" data-island="island2">🏝️ ' + isl2.name + '</button>';
     } else if (state.stage >= 3){
       tab2 = '<button type="button" class="tab tab--ghost ' + (state.selectedIslandId==="island2"?"tab--active":"") + '" data-action="select-island" data-island="island2">➕ جزيرة جديدة</button>';
     }
-    return '<div class="tabs"><button type="button" class="tab ' + (state.selectedIslandId==="island1"?"tab--active":"") + '" data-action="select-island" data-island="island1">🏝 ' + isl1.name + '</button>' + tab2 + '</div>';
+    return '<div class="tabs"><button type="button" class="tab ' + (state.selectedIslandId==="island1"?"tab--active":"") + '" data-action="select-island" data-island="island1">🏝️ ' + isl1.name + '</button>' + tab2 + '</div>';
   }
 
   function foundColonyHTML(){
@@ -504,7 +504,7 @@
       '<div class="chip"><span class="chip-icon">👥</span><span class="chip-value">' + island.pop + '/' + island.housing + '</span><span class="chip-label">السكان</span></div>' +
       '<div class="chip"><span class="chip-icon">🌾</span><span class="chip-value">' + Math.floor(island.food) + '</span><span class="chip-label">طعام</span></div>' +
       '<div class="chip"><span class="chip-icon">🪵</span><span class="chip-value">' + Math.floor(island.wood) + '</span><span class="chip-label">خشب</span></div>' +
-      '<div class="chip chip--wide"><span class="chip-icon">🌫</span><div class="pollution-bar"><div class="pollution-fill" style="width:' + island.pollution + '%;background:' + pColor + '"></div></div><span class="chip-value">' + Math.round(island.pollution) + '%</span></div>' +
+      '<div class="chip chip--wide"><span class="chip-icon">🌫️</span><div class="pollution-bar"><div class="pollution-fill" style="width:' + island.pollution + '%;background:' + pColor + '"></div></div><span class="chip-value">' + Math.round(island.pollution) + '%</span></div>' +
       '</div>';
   }
 
@@ -553,7 +553,7 @@
     var island = state.islands.find(function(i){ return i.id === state.selectedIslandId; });
     var info = stageInfo();
     var html = '';
-    html += '<header class="topbar"><div class="brand">🏝 <span>حضارة الجزيرة</span></div><div class="stage-badge">' + info.name + '</div></header>';
+    html += '<header class="topbar"><div class="brand">🏝️ <span>حضارة الجزيرة</span></div><div class="stage-badge">' + info.name + '</div></header>';
     html += '<p class="stage-progress">' + info.progress + '</p>';
     if (state.showHelp) html += helpHTML();
     html += tabsHTML();
@@ -566,7 +566,7 @@
     }
     if (bothFounded()) html += shipPanelHTML();
     html += logHTML();
-    html += '<footer class="footer"><button type="button" class="btn-ghost" data-action="toggle-help">' + (state.showHelp?"إخفاء الشرح":"❓ كيف ألعب؟") + '</button><button type="button" class="btn-danger" data-action="reset-game">' + (state.resetArmed?"⚠ اضغط للتأكيد":"🗑 بدء لعبة جديدة") + '</button></footer>';
+    html += '<footer class="footer"><button type="button" class="btn-ghost" data-action="toggle-help">' + (state.showHelp?"إخفاء الشرح":"❓ كيف ألعب؟") + '</button><button type="button" class="btn-danger" data-action="reset-game">' + (state.resetArmed?"⚠️ اضغط للتأكيد":"🗑️ بدء لعبة جديدة") + '</button></footer>';
     app.innerHTML = html;
   }
 
@@ -587,7 +587,7 @@
       } else {
         var t = island.tiles[index];
         var desc = t.building ? BUILDINGS[t.building.key].name : (t.terrain === "water" ? "🌊 ماء" : (t.terrain === "forest" ? "🌲 غابة" : "🌱 أرض عشبية فارغة"));
-        addLog("ℹ " + desc);
+        addLog("ℹ️ " + desc);
       }
     } else if (action === "select-island"){
       state.selectedIslandId = el.dataset.island;
@@ -602,7 +602,7 @@
         initNewGame();
       } else {
         state.resetArmed = true;
-        addLog("⚠ اضغط الزر مرة أخرى خلال 5 ثوانٍ لتأكيد حذف التقدم.");
+        addLog("⚠️ اضغط الزر مرة أخرى خلال 5 ثوانٍ لتأكيد حذف التقدم.");
         setTimeout(function(){ if (state){ state.resetArmed = false; render(); } }, 5000);
       }
     }
