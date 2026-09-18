@@ -1,0 +1,632 @@
+!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>حضارة الجزيرة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --color-bg:#F2E8D5;
+    --color-surface:#FFFFFF;
+    --color-surface-2:#E7DBBF;
+    --color-text:#1E2B27;
+    --color-text-muted:#5B6B63;
+    --color-primary:#1E7F7A;
+    --color-leaf:#4C8C4A;
+    --color-danger:#D9634A;
+    --color-warning:#E0A93E;
+    --color-water:#7FB3D5;
+    --color-water-deep:#4A87B0;
+    --color-grass:#8FBF6B;
+    --color-forest:#3E7A46;
+    --radius-s:8px;
+    --radius-m:14px;
+    --font-main:'Cairo','Tahoma',sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --color-bg:#0D1B22;
+      --color-surface:#16262C;
+      --color-surface-2:#1F343B;
+      --color-text:#E8F0EC;
+      --color-text-muted:#9FB4AC;
+      --color-primary:#4FB3AC;
+      --color-leaf:#6FBF6A;
+      --color-danger:#E97A63;
+      --color-warning:#E8C069;
+      --color-water:#2E5670;
+      --color-water-deep:#1D3C50;
+      --color-grass:#3E5C3A;
+      --color-forest:#25452B;
+    }
+  }
+  :root[data-theme="dark"]{
+    --color-bg:#0D1B22;
+    --color-surface:#16262C;
+    --color-surface-2:#1F343B;
+    --color-text:#E8F0EC;
+    --color-text-muted:#9FB4AC;
+    --color-primary:#4FB3AC;
+    --color-leaf:#6FBF6A;
+    --color-danger:#E97A63;
+    --color-warning:#E8C069;
+    --color-water:#2E5670;
+    --color-water-deep:#1D3C50;
+    --color-grass:#3E5C3A;
+    --color-forest:#25452B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--color-bg);
+    color:var(--color-text);
+    font-family:var(--font-main);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  button, select, input{font-family:inherit;}
+  button:focus-visible, input:focus-visible, select:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;}
+  #app{width:100%;max-width:520px;padding:16px 14px 36px;display:flex;flex-direction:column;gap:14px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .brand{font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:6px;}
+  .stage-badge{background:var(--color-primary);color:#fff;padding:6px 12px;border-radius:999px;font-weight:700;font-size:0.82rem;white-space:nowrap;}
+  .stage-progress{margin:0;font-size:0.8rem;color:var(--color-text-muted);}
+  .help-card{background:var(--color-surface);border-radius:var(--radius-m);padding:12px 14px;font-size:0.85rem;line-height:1.75;border:1px solid var(--color-surface-2);}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;}
+  .tab{border:none;background:var(--color-surface-2);color:var(--color-text);padding:8px 14px;border-radius:999px;font-weight:600;font-size:0.82rem;cursor:pointer;}
+  .tab--active{background:var(--color-primary);color:#fff;}
+  .tab--ghost{opacity:0.8;border:1px dashed var(--color-primary);background:transparent;}
+  .found-card{background:var(--color-surface);border-radius:var(--radius-m);padding:16px;text-align:center;display:flex;flex-direction:column;gap:10px;border:1px solid var(--color-surface-2);}
+  .cost-line{color:var(--color-text-muted);font-size:0.82rem;margin:0;}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{background:var(--color-surface);border-radius:var(--radius-s);padding:8px 10px;display:flex;align-items:center;gap:6px;font-size:0.8rem;flex:1 1 auto;min-width:76px;border:1px solid var(--color-surface-2);}
+  .chip-icon{font-size:1rem;}
+  .chip-value{font-weight:800;}
+  .chip-label{color:var(--color-text-muted);font-size:0.7rem;}
+  .chip--wide{flex:1 1 100%;}
+  .pollution-bar{flex:1;height:8px;background:var(--color-surface-2);border-radius:999px;overflow:hidden;}
+  .pollution-fill{height:100%;transition:width 0.6s ease, background 0.6s ease;}
+  .palette{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+  .tool{flex:0 0 auto;background:var(--color-surface);border:2px solid transparent;border-radius:var(--radius-s);padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-width:62px;position:relative;}
+  .tool-icon{font-size:1.25rem;}
+  .tool-name{font-size:0.65rem;font-weight:600;white-space:nowrap;}
+  .tool-cost{font-size:0.62rem;color:var(--color-text-muted);}
+  .tool--selected{border-color:var(--color-primary);background:var(--color-surface-2);}
+  .tool--locked{opacity:0.4;}
+  .tool--unaffordable{opacity:0.6;}
+  .tool-lock{position:absolute;top:2px;right:4px;font-size:0.68rem;}
+  .tool--demolish.tool--selected{border-color:var(--color-danger);}
+  .grid{display:grid;gap:4px;background:var(--color-water-deep);padding:6px;border-radius:var(--radius-m);}
+  .tile{aspect-ratio:1;border:none;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;position:relative;padding:0;cursor:pointer;}
+  .tile--water{background:var(--color-water);}
+  .tile--grass{background:var(--color-grass);}
+  .tile--forest{background:var(--color-forest);}
+  .tile--built{box-shadow:inset 0 0 0 2px rgba(255,255,255,0.55);}
+  .tile-badge{position:absolute;bottom:1px;right:1px;font-size:0.5rem;background:rgba(0,0,0,0.45);color:#fff;border-radius:4px;padding:0 2px;}
+  .ship-card{background:var(--color-surface);border-radius:var(--radius-m);padding:12px 14px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--color-surface-2);}
+  .ship-card h3{margin:0;font-size:0.92rem;}
+  .ship-form{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .ship-route{font-size:0.76rem;color:var(--color-text-muted);flex:1 1 100%;}
+  .ship-select,.ship-input{padding:6px 8px;border-radius:8px;border:1px solid var(--color-surface-2);background:var(--color-bg);color:var(--color-text);}
+  .ship-input{width:70px;}
+  .ship-hint{font-size:0.7rem;color:var(--color-text-muted);margin:0;}
+  .ship-pending-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;}
+  .ship-pending{font-size:0.76rem;display:flex;align-items:center;gap:6px;}
+  .ship-boat{display:inline-block;animation:bob 1.6s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+  .log{background:var(--color-surface);border-radius:var(--radius-m);padding:10px 12px;max-height:150px;overflow-y:auto;border:1px solid var(--color-surface-2);}
+  .log ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;}
+  .log li{font-size:0.76rem;color:var(--color-text-muted);}
+  .log li:first-child{color:var(--color-text);font-weight:600;}
+  .footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+  .btn-ghost,.btn-primary,.btn-danger{border:none;border-radius:999px;padding:9px 16px;font-weight:700;font-size:0.8rem;cursor:pointer;}
+  .btn-ghost{background:var(--color-surface-2);color:var(--color-text);}
+  .btn-primary{background:var(--color-primary);color:#fff;}
+  .btn-danger{background:transparent;color:var(--color-danger);border:1px solid var(--color-danger);}
+  @media (prefers-reduced-motion: reduce){
+    .ship-boat{animation:none;}
+    .pollution-fill{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+  "use strict";
+
+  var SAVE_KEY = "islandCivGameV1";
+
+  var CONFIG = {
+    tickMs: 2000,
+    startWood: 40,
+    startFood: 30,
+    startPop: 5,
+    foodPerPop: 1,
+    forestCapacity: 60,
+    naturalPollutionDecay: 1,
+    pollutionGrowthThreshold: 70,
+    pollutionCrisisThreshold: 90,
+    stage2: { roads: 3, pop: 15 },
+    stage3: { pop: 30 },
+    colonyCost: { wood: 20, food: 10 },
+    shipFuel: 5,
+    shipTravelMs: 8000
+  };
+
+  var BUILDINGS = {
+    house: { icon:"🏠", name:"منزل", cost:10, terrain:["grass"], housing:5, minStage:1, desc:"يزيد سعة السكن بمقدار 5 نسمات" },
+    farm: { icon:"🌾", name:"مزرعة", cost:15, terrain:["grass"], workerCap:2, foodPerWorker:3, minStage:1, desc:"تنتج الطعام حسب عدد العمال فيها" },
+    woodcutter: { icon:"🪓", name:"كوخ حطّاب", cost:10, terrain:["forest"], workerCap:2, woodPerWorker:2, pollutionPerWorker:1.5, minStage:1, desc:"ينتج خشبًا، لكنه يلوّث الهواء ويستنزف الغابة تدريجيًا" },
+    park: { icon:"🌳", name:"حديقة", cost:8, terrain:["grass"], pollutionReduce:4, minStage:1, desc:"تنقّي الهواء وتساعد الأشجار المجاورة على التجدد" },
+    road: { icon:"🛤", name:"طريق", cost:5, terrain:["grass"], minStage:1, desc:"يقرّب حضارتك من اكتشاف العربات والخيول" },
+    port: { icon:"⚓", name:"ميناء", cost:40, terrain:["grass"], needsWater:true, minStage:2, desc:"يفتح الطريق أمام بناء السفن والتجارة البحرية" }
+  };
+
+  var state = null;
+  var app = document.getElementById("app");
+
+  function clamp(v, min, max){ return Math.min(max, Math.max(min, v)); }
+
+  function resourceLabel(key){
+    return key === "wood" ? "خشب" : (key === "food" ? "طعام" : "من السكان");
+  }
+
+  function neighbors4(index, cols, rows){
+    var r = Math.floor(index / cols), c = index % cols;
+    var result = [];
+    if (r > 0) result.push(index - cols);
+    if (r < rows - 1) result.push(index + cols);
+    if (c > 0) result.push(index - 1);
+    if (c < cols - 1) result.push(index + 1);
+    return result;
+  }
+
+  function generateIsland(cols, rows){
+    var tiles = [];
+    for (var r = 0; r < rows; r++){
+      for (var c = 0; c < cols; c++){
+        var isBorder = r === 0 || r === rows - 1 || c === 0 || c === cols - 1;
+        var terrain = isBorder ? "water" : (Math.random() < 0.42 ? "forest" : "grass");
+        var tile = { terrain: terrain, building: null };
+        if (terrain === "forest") tile.forestAmount = CONFIG.forestCapacity;
+        tiles.push(tile);
+      }
+    }
+    return tiles;
+  }
+
+  function ensureGrassTile(island){
+    var idx = island.tiles.findIndex(function(t){ return t.terrain === "grass"; });
+    if (idx < 0){
+      idx = Math.floor(island.tiles.length / 2);
+      island.tiles[idx].terrain = "grass";
+      delete island.tiles[idx].forestAmount;
+    }
+    return idx;
+  }
+
+  function addLog(msg){
+    if (!msg || !state) return;
+    state.log.unshift(msg);
+    if (state.log.length > 6) state.log.length = 6;
+  }
+
+  function placeBuilding(island, index, key, opts){
+    opts = opts || {};
+    var cfg = BUILDINGS[key];
+    if (!cfg) return { ok:false, msg:"أداة غير معروفة." };
+    var tile = island.tiles[index];
+    if (!opts.free){
+      if (state.stage < cfg.minStage) return { ok:false, msg:"🔒 " + cfg.name + " يتطلب مرحلة تقنية أعلى." };
+      if (tile.building) return { ok:false, msg:"🚫 هذه الأرض مشغولة بمبنى بالفعل." };
+      if (cfg.terrain.indexOf(tile.terrain) === -1) return { ok:false, msg:"🚫 لا يمكن بناء " + cfg.name + " هنا." };
+      if (cfg.needsWater){
+        var ns = neighbors4(index, island.cols, island.rows);
+        var hasWater = ns.some(function(n){ return island.tiles[n].terrain === "water"; });
+        if (!hasWater) return { ok:false, msg:"🚫 الميناء يجب أن يكون بجانب الماء." };
+      }
+      if (island.wood < cfg.cost) return { ok:false, msg:"🚫 لا يوجد خشب كافٍ (يحتاج " + cfg.cost + ")." };
+      island.wood -= cfg.cost;
+    } else if (tile.building){
+      return { ok:false, msg:"مشغول." };
+    }
+    tile.building = { key: key, workers: 0 };
+    if (key === "house") island.housing += cfg.housing;
+    return { ok:true, msg:"✅ تم بناء " + cfg.name + " في " + island.name + "." };
+  }
+
+  function demolishTile(island, index){
+    var tile = island.tiles[index];
+    if (!tile.building) return { ok:false, msg:"لا يوجد مبنى هنا لهدمه." };
+    var cfg = BUILDINGS[tile.building.key];
+    var refund = Math.floor(cfg.cost / 2);
+    island.wood += refund;
+    if (tile.building.key === "house") island.housing = Math.max(0, island.housing - cfg.housing);
+    var name = cfg.name;
+    tile.building = null;
+    return { ok:true, msg:"🧹 تم هدم " + name + " في " + island.name + " (+" + refund + " خشب)." };
+  }
+
+  function recomputeGlobals(){
+    var totalRoads = 0, portBuilt = false, totalPop = 0;
+    state.islands.forEach(function(isl){
+      if (!isl.founded) return;
+      totalPop += isl.pop;
+      isl.tiles.forEach(function(t){
+        if (t.building){
+          if (t.building.key === "road") totalRoads++;
+          if (t.building.key === "port") portBuilt = true;
+        }
+      });
+    });
+    state.totalRoads = totalRoads;
+    state.portBuilt = portBuilt;
+    state.totalPop = totalPop;
+  }
+
+  function checkStageUp(){
+    if (state.stage === 1 && state.totalRoads >= CONFIG.stage2.roads && state.totalPop >= CONFIG.stage2.pop){
+      state.stage = 2;
+      addLog("🎉 دخلت حضارتك عصر العربات والخيول! أصبح بإمكانك بناء الموانئ ⚓.");
+    }
+    if (state.stage === 2 && state.portBuilt && state.totalPop >= CONFIG.stage3.pop){
+      state.stage = 3;
+      addLog("🎉 دخلت حضارتك عصر السفن! يمكنك الآن تأسيس مستعمرة في جزيرة جديدة 🚢.");
+    }
+  }
+
+  function tickIsland(island){
+    var available = island.pop;
+    island.tiles.forEach(function(t){
+      if (t.building && t.building.key === "farm"){
+        var assign = Math.min(BUILDINGS.farm.workerCap, available);
+        t.building.workers = assign;
+        available -= assign;
+      }
+    });
+    island.tiles.forEach(function(t){
+      if (t.building && t.building.key === "woodcutter"){
+        var eligible = t.terrain === "forest";
+        var assign2 = eligible ? Math.min(BUILDINGS.woodcutter.workerCap, available) : 0;
+        t.building.workers = assign2;
+        available -= assign2;
+      }
+    });
+    island.idleWorkers = available;
+
+    var foodProduced = 0, woodProduced = 0, pollutionDelta = -CONFIG.naturalPollutionDecay;
+    island.tiles.forEach(function(t){
+      if (!t.building) return;
+      var cfg = BUILDINGS[t.building.key];
+      if (t.building.key === "farm"){
+        foodProduced += t.building.workers * cfg.foodPerWorker;
+      } else if (t.building.key === "woodcutter" && t.terrain === "forest"){
+        var want = t.building.workers * cfg.woodPerWorker;
+        var actual = Math.min(want, t.forestAmount);
+        woodProduced += actual;
+        t.forestAmount -= actual;
+        pollutionDelta += t.building.workers * cfg.pollutionPerWorker;
+        if (t.forestAmount <= 0){
+          t.terrain = "grass";
+          delete t.forestAmount;
+          addLog("🌲 نفدت غابة عند كوخ حطّاب في " + island.name + "! ازرع حديقة لمساعدتها على التجدد.");
+        }
+      } else if (t.building.key === "park"){
+        pollutionDelta -= cfg.pollutionReduce;
+      }
+    });
+    island.food += foodProduced;
+    island.wood += woodProduced;
+    island.pollution = clamp(island.pollution + pollutionDelta, 0, 100);
+
+    var needed = island.pop * CONFIG.foodPerPop;
+    if (island.food >= needed){
+      island.food -= needed;
+      if (island.pollution < CONFIG.pollutionGrowthThreshold && island.pop < island.housing && island.food >= island.pop && Math.random() < 0.5){
+        island.pop += 1;
+      }
+    } else {
+      island.food = 0;
+      if (island.pop > 0){
+        island.pop -= 1;
+        addLog("🥀 نقص الطعام في " + island.name + "! انخفض عدد السكان إلى " + island.pop + ".");
+      }
+    }
+    if (island.pollution >= CONFIG.pollutionCrisisThreshold && island.pop > 0 && Math.random() < 0.3){
+      island.pop = Math.max(0, island.pop - 1);
+      addLog("☠ تلوث الهواء الخطير في " + island.name + " يضرّ بصحة السكان!");
+    }
+
+    for (var i = 0; i < island.tiles.length; i++){
+      var t2 = island.tiles[i];
+      if (t2.terrain === "grass" && !t2.building){
+        var ns2 = neighbors4(i, island.cols, island.rows);
+        var hasPark = ns2.some(function(n){
+          var nt = island.tiles[n];
+          return nt.building && nt.building.key === "park";
+        });
+        var chance = hasPark ? 0.04 : 0.006;
+        if (Math.random() < chance){
+          t2.terrain = "forest";
+          t2.forestAmount = CONFIG.forestCapacity;
+        }
+      }
+    }
+  }
+
+  function tick(){
+    state.islands.forEach(function(isl){ if (isl.founded) tickIsland(isl); });
+    var now = Date.now();
+    var arrived = state.pendingShipments.filter(function(s){ return now >= s.arrivalAt; });
+    state.pendingShipments = state.pendingShipments.filter(function(s){ return now < s.arrivalAt; });
+    arrived.forEach(function(s){
+      var dest = state.islands.find(function(i){ return i.id === s.to; });
+      if (dest){
+        dest[s.resource] += s.amount;
+        addLog("⚓ وصلت سفينة من " + s.fromName + " إلى " + dest.name + " تحمل " + s.amount + " " + resourceLabel(s.resource) + ".");
+      }
+    });
+    recomputeGlobals();
+    checkStageUp();
+    saveState();
+    render();
+  }
+
+  function foundColony(){
+    if (state.stage < 3){ addLog("🔒 يجب الوصول لعصر السفن أولاً."); return; }
+    var island1 = state.islands[0], island2 = state.islands[1];
+    if (island2.founded) return;
+    var cost = CONFIG.colonyCost;
+    if (island1.wood < cost.wood || island1.food < cost.food){
+      addLog("🚫 تحتاج " + cost.wood + " خشب و" + cost.food + " طعام في " + island1.name + " لتأسيس المستعمرة.");
+      return;
+    }
+    island1.wood -= cost.wood;
+    island1.food -= cost.food;
+    island2.tiles = generateIsland(island2.cols, island2.rows);
+    island2.pop = 3; island2.wood = 10; island2.food = 10; island2.pollution = 0; island2.housing = 0;
+    island2.founded = true;
+    var hIdx = ensureGrassTile(island2);
+    placeBuilding(island2, hIdx, "house", { free:true });
+    addLog("🚢 أبحر المستوطنون وأسّسوا مستعمرة جديدة في " + island2.name + "!");
+    state.selectedIslandId = "island2";
+  }
+
+  function sendShip(form){
+    var fd = new FormData(form);
+    var resource = fd.get("resource");
+    var amount = parseInt(fd.get("amount"), 10);
+    var source = state.islands.find(function(i){ return i.id === state.selectedIslandId; });
+    var dest = state.islands.find(function(i){ return i.id !== state.selectedIslandId && i.founded; });
+    if (!dest){ addLog("🚫 لا توجد جزيرة أخرى لإرسال السفينة إليها بعد."); return; }
+    if (!amount || amount <= 0){ addLog("🚫 أدخل كمية صحيحة للشحن."); return; }
+    var fuel = CONFIG.shipFuel;
+    if (resource === "pop"){
+      if (source.wood < fuel){ addLog("🚫 تحتاج " + fuel + " خشب كوقود للسفينة."); return; }
+      if (source.pop - amount < 1){ addLog("🚫 يجب أن يبقى سكان في " + source.name + "."); return; }
+      source.pop -= amount;
+      source.wood -= fuel;
+    } else if (resource === "wood"){
+      if (source.wood < amount + fuel){ addLog("🚫 لا يوجد خشب كافٍ (تحتاج " + (amount+fuel) + " شاملة الوقود)."); return; }
+      source.wood -= amount;
+      source.wood -= fuel;
+    } else {
+      if (source.food < amount){ addLog("🚫 لا يوجد طعام كافٍ للشحن."); return; }
+      if (source.wood < fuel){ addLog("🚫 تحتاج " + fuel + " خشب كوقود للسفينة."); return; }
+      source.food -= amount;
+      source.wood -= fuel;
+    }
+    state.pendingShipments.push({ from:source.id, fromName:source.name, to:dest.id, resource:resource, amount:amount, arrivalAt: Date.now() + CONFIG.shipTravelMs });
+    addLog("🚢 أبحرت سفينة من " + source.name + " إلى " + dest.name + " تحمل " + amount + " " + resourceLabel(resource) + ".");
+  }
+
+  function initNewGame(){
+    var island1 = {
+      id:"island1", name:"الجزيرة الأولى", cols:7, rows:7,
+      tiles: generateIsland(7,7),
+      pop: CONFIG.startPop, housing:0, food: CONFIG.startFood, wood: CONFIG.startWood, pollution:0,
+      founded:true, idleWorkers:0
+    };
+    var hIdx = ensureGrassTile(island1);
+    var island2 = {
+      id:"island2", name:"الجزيرة الثانية", cols:6, rows:6,
+      tiles: [], pop:0, housing:0, food:0, wood:0, pollution:0, founded:false, idleWorkers:0
+    };
+    var s = {
+      stage:1, totalRoads:0, portBuilt:false, totalPop:island1.pop,
+      islands:[island1, island2],
+      selectedIslandId:"island1", selectedTool:null,
+      pendingShipments:[],
+      log:["🏝 رست سفينتك على شاطئ جزيرة مجهولة... حان وقت بناء حضارتك!"],
+      resetArmed:false, showHelp:true
+    };
+    state = s;
+    placeBuilding(island1, hIdx, "house", { free:true });
+    return s;
+  }
+
+  function saveState(){
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(e){}
+  }
+  function loadState(){
+    try {
+      var raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || !parsed.islands) return null;
+      return parsed;
+    } catch(e){ return null; }
+  }
+
+  function pollutionColor(v){
+    if (v < 30) return "var(--color-leaf)";
+    if (v < 60) return "var(--color-warning)";
+    if (v < 85) return "#E08A3E";
+    return "var(--color-danger)";
+  }
+
+  function stageInfo(){
+    if (state.stage === 1) return { name:"🚶 عصر المشي", progress:"🛤 طرق: " + state.totalRoads + "/" + CONFIG.stage2.roads + " · 👥 سكان الحضارة: " + state.totalPop + "/" + CONFIG.stage2.pop };
+    if (state.stage === 2) return { name:"🐎 عصر العربات والخيول", progress: state.portBuilt ? ("👥 سكان الحضارة: " + state.totalPop + "/" + CONFIG.stage3.pop + " (الميناء جاهز ⚓)") : ("⚓ ابنِ ميناءً وزد السكان إلى " + CONFIG.stage3.pop + " للانتقال لعصر السفن") };
+    return { name:"🚢 عصر السفن والتجارة البحرية", progress:"🌊 حضارتك تُبحر بين الجزر بحرية!" };
+  }
+
+  function bothFounded(){ return state.islands[0].founded && state.islands[1].founded; }
+
+  function helpHTML(){
+    return '<div class="help-card"><p>ابنِ مزارع 🌾 لإطعام سكانك، وأكواخ حطّابين 🪓 لجمع الخشب — لكن احذر: الحطّابون يلوّثون الهواء ويستنزفون الغابة! ازرع حدائق 🌳 لتنقية الهواء ومساعدة الغابة على التجدد. طوّر حضارتك عبر بناء الطرق ثم الموانئ، وأبحر بالسفن 🚢 لنقل الناس والبضائع إلى جزيرة جديدة.</p></div>';
+  }
+
+  function tabsHTML(){
+    var isl1 = state.islands[0], isl2 = state.islands[1];
+    var tab2 = "";
+    if (isl2.founded){
+      tab2 = '<button type="button" class="tab ' + (state.selectedIslandId==="island2"?"tab--active":"") + '" data-action="select-island" data-island="island2">🏝 ' + isl2.name + '</button>';
+    } else if (state.stage >= 3){
+      tab2 = '<button type="button" class="tab tab--ghost ' + (state.selectedIslandId==="island2"?"tab--active":"") + '" data-action="select-island" data-island="island2">➕ جزيرة جديدة</button>';
+    }
+    return '<div class="tabs"><button type="button" class="tab ' + (state.selectedIslandId==="island1"?"tab--active":"") + '" data-action="select-island" data-island="island1">🏝 ' + isl1.name + '</button>' + tab2 + '</div>';
+  }
+
+  function foundColonyHTML(){
+    var c = CONFIG.colonyCost;
+    return '<div class="found-card"><p>وصلت حضارتك لعصر السفن! أسّس مستعمرة جديدة في هذه الجزيرة لتوسيع نفوذك.</p><p class="cost-line">التكلفة (من الجزيرة الأولى): 🪵 ' + c.wood + ' · 🌾 ' + c.food + '</p><button type="button" class="btn-primary" data-action="found-colony">🚢 أسّس المستعمرة</button></div>';
+  }
+
+  function statsHTML(island){
+    var pColor = pollutionColor(island.pollution);
+    return '<div class="stats">' +
+      '<div class="chip"><span class="chip-icon">👥</span><span class="chip-value">' + island.pop + '/' + island.housing + '</span><span class="chip-label">السكان</span></div>' +
+      '<div class="chip"><span class="chip-icon">🌾</span><span class="chip-value">' + Math.floor(island.food) + '</span><span class="chip-label">طعام</span></div>' +
+      '<div class="chip"><span class="chip-icon">🪵</span><span class="chip-value">' + Math.floor(island.wood) + '</span><span class="chip-label">خشب</span></div>' +
+      '<div class="chip chip--wide"><span class="chip-icon">🌫</span><div class="pollution-bar"><div class="pollution-fill" style="width:' + island.pollution + '%;background:' + pColor + '"></div></div><span class="chip-value">' + Math.round(island.pollution) + '%</span></div>' +
+      '</div>';
+  }
+
+  function paletteHTML(island){
+    var order = ["house","farm","woodcutter","park","road","port"];
+    var items = order.map(function(key){
+      var cfg = BUILDINGS[key];
+      var locked = state.stage < cfg.minStage;
+      var afford = island.wood >= cfg.cost;
+      var selected = state.selectedTool === key;
+      var cls = ["tool", selected?"tool--selected":"", locked?"tool--locked":"", (!locked && !afford)?"tool--unaffordable":""].filter(Boolean).join(" ");
+      return '<button type="button" class="' + cls + '" data-action="select-tool" data-key="' + key + '" title="' + cfg.desc + (locked?" (مقفل)":"") + '"><span class="tool-icon">' + cfg.icon + '</span><span class="tool-name">' + cfg.name + '</span><span class="tool-cost">🪵' + cfg.cost + '</span>' + (locked?'<span class="tool-lock">🔒</span>':'') + '</button>';
+    }).join("");
+    var demoSel = state.selectedTool === "demolish";
+    return '<div class="palette">' + items + '<button type="button" class="tool tool--demolish ' + (demoSel?"tool--selected":"") + '" data-action="select-tool" data-key="demolish" title="هدم مبنى واسترجاع نصف الخشب"><span class="tool-icon">🧹</span><span class="tool-name">هدم</span></button></div>';
+  }
+
+  function gridHTML(island){
+    var cells = island.tiles.map(function(t, i){
+      var icon = t.building ? BUILDINGS[t.building.key].icon : (t.terrain === "forest" ? "🌲" : "");
+      var badge = "";
+      if (t.building && BUILDINGS[t.building.key].workerCap){
+        badge = '<span class="tile-badge">' + t.building.workers + '/' + BUILDINGS[t.building.key].workerCap + '</span>';
+      }
+      return '<button type="button" class="tile tile--' + t.terrain + ' ' + (t.building?"tile--built":"") + '" data-action="tile-click" data-island="' + island.id + '" data-index="' + i + '" aria-label="بلاطة">' + icon + badge + '</button>';
+    }).join("");
+    return '<div class="grid" style="grid-template-columns:repeat(' + island.cols + ',1fr)">' + cells + '</div>';
+  }
+
+  function shipPanelHTML(){
+    var source = state.islands.find(function(i){ return i.id === state.selectedIslandId; });
+    var dest = state.islands.find(function(i){ return i.id !== state.selectedIslandId; });
+    var pending = state.pendingShipments.map(function(s){
+      var secs = Math.max(0, Math.round((s.arrivalAt - Date.now()) / 1000));
+      var destName = state.islands.find(function(i){ return i.id === s.to; }).name;
+      return '<li class="ship-pending"><span class="ship-boat">🚢</span> من ' + s.fromName + ' إلى ' + destName + ': ' + s.amount + ' ' + resourceLabel(s.resource) + ' — تصل خلال ' + secs + ' ثانية</li>';
+    }).join("");
+    return '<div class="ship-card"><h3>⚓ ميناء الشحن</h3><form id="ship-form" class="ship-form"><span class="ship-route">من ' + source.name + ' إلى ' + dest.name + '</span><select name="resource" class="ship-select"><option value="wood">🪵 خشب</option><option value="food">🌾 طعام</option><option value="pop">👥 سكان</option></select><input type="number" name="amount" min="1" value="5" class="ship-input" /><button type="submit" class="btn-primary">إرسال</button></form><p class="ship-hint">تكلفة الوقود: 🪵 ' + CONFIG.shipFuel + ' خشب من الجزيرة المرسِلة.</p>' + (pending ? ('<ul class="ship-pending-list">' + pending + '</ul>') : '') + '</div>';
+  }
+
+  function logHTML(){
+    return '<div class="log"><ul>' + state.log.map(function(m){ return '<li>' + m + '</li>'; }).join("") + '</ul></div>';
+  }
+
+  function render(){
+    var island = state.islands.find(function(i){ return i.id === state.selectedIslandId; });
+    var info = stageInfo();
+    var html = '';
+    html += '<header class="topbar"><div class="brand">🏝 <span>حضارة الجزيرة</span></div><div class="stage-badge">' + info.name + '</div></header>';
+    html += '<p class="stage-progress">' + info.progress + '</p>';
+    if (state.showHelp) html += helpHTML();
+    html += tabsHTML();
+    if (island.founded){
+      html += statsHTML(island);
+      html += paletteHTML(island);
+      html += gridHTML(island);
+    } else {
+      html += foundColonyHTML();
+    }
+    if (bothFounded()) html += shipPanelHTML();
+    html += logHTML();
+    html += '<footer class="footer"><button type="button" class="btn-ghost" data-action="toggle-help">' + (state.showHelp?"إخفاء الشرح":"❓ كيف ألعب؟") + '</button><button type="button" class="btn-danger" data-action="reset-game">' + (state.resetArmed?"⚠ اضغط للتأكيد":"🗑 بدء لعبة جديدة") + '</button></footer>';
+    app.innerHTML = html;
+  }
+
+  app.addEventListener("click", function(e){
+    var el = e.target.closest("[data-action]");
+    if (!el) return;
+    var action = el.dataset.action;
+    if (action === "select-tool"){
+      var key = el.dataset.key;
+      state.selectedTool = state.selectedTool === key ? null : key;
+    } else if (action === "tile-click"){
+      var island = state.islands.find(function(i){ return i.id === el.dataset.island; });
+      var index = parseInt(el.dataset.index, 10);
+      if (state.selectedTool === "demolish"){
+        addLog(demolishTile(island, index).msg);
+      } else if (state.selectedTool){
+        addLog(placeBuilding(island, index, state.selectedTool).msg);
+      } else {
+        var t = island.tiles[index];
+        var desc = t.building ? BUILDINGS[t.building.key].name : (t.terrain === "water" ? "🌊 ماء" : (t.terrain === "forest" ? "🌲 غابة" : "🌱 أرض عشبية فارغة"));
+        addLog("ℹ " + desc);
+      }
+    } else if (action === "select-island"){
+      state.selectedIslandId = el.dataset.island;
+      state.selectedTool = null;
+    } else if (action === "found-colony"){
+      foundColony();
+    } else if (action === "toggle-help"){
+      state.showHelp = !state.showHelp;
+    } else if (action === "reset-game"){
+      if (state.resetArmed){
+        try { localStorage.removeItem(SAVE_KEY); } catch(err){}
+        initNewGame();
+      } else {
+        state.resetArmed = true;
+        addLog("⚠ اضغط الزر مرة أخرى خلال 5 ثوانٍ لتأكيد حذف التقدم.");
+        setTimeout(function(){ if (state){ state.resetArmed = false; render(); } }, 5000);
+      }
+    }
+    recomputeGlobals();
+    checkStageUp();
+    saveState();
+    render();
+  });
+
+  app.addEventListener("submit", function(e){
+    if (e.target && e.target.id === "ship-form"){
+      e.preventDefault();
+      sendShip(e.target);
+      recomputeGlobals();
+      saveState();
+      render();
+    }
+  });
+
+  var loaded = loadState();
+  state = loaded || initNewGame();
+  render();
+  setInterval(tick, CONFIG.tickMs);
+})();
+</script>
+</body>
+</html>
